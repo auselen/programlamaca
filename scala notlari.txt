@@ -1,0 +1,15 @@
+object OptParser {
+  val map: Map[Symbol, Any] = Map()
+  val list: List[Symbol] = List()
+
+  def parse(args: Array[String]): (Map[Symbol, Any], List[Symbol]) = _parse(map, list, args.toList)
+
+  private [this] def _parse(map: Map[Symbol, Any], list: List[Symbol], args: List[String]): (Map[Symbol, Any], List[Symbol]) = {
+    args match {
+      case Nil => (map, list)
+      case arg :: value :: tail if arg.startsWith("--") && !value.startsWith("--") => _parse(map ++ Map(Symbol(arg.substring(2)) -> value), list, tail)
+      case arg :: tail if arg.startsWith("--") => _parse(map ++ Map(Symbol(arg.substring(2)) -> true), list, tail)
+      case opt :: tail => _parse(map, list :+ Symbol(opt), tail)
+    }
+  }
+}
